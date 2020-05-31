@@ -3,6 +3,7 @@ import datetime
 
 commandPrefix : str = None
 embedFooter: dict = {}
+last10messages: dict = {}
 
 def embed(title, url = None, description = None, fields = None, image = None, thumbnail = None, author =  None) -> discord.Embed:
     e = discord.Embed.from_dict({
@@ -32,7 +33,6 @@ def command(message) -> (str, str):
         return None, None
 
 async def spamProtection(message: discord.Message, spamWarnMsg: str, spamValue: int):
-    last10messages: dict = {}
     if message.channel not in last10messages:
         last10messages[message.channel] = []
     if not message.author.bot and message.content[0] != commandPrefix:
@@ -40,7 +40,7 @@ async def spamProtection(message: discord.Message, spamWarnMsg: str, spamValue: 
     if len(last10messages[message.channel]) > spamValue:
         del last10messages[message.channel][0]
     a = 0
-    print(len(last10messages[message.channel]), last10messages)
+    #print(len(last10messages[message.channel]), last10messages)
     for msg in last10messages[message.channel]:
         for i in msg:
             print(msg[i])
@@ -50,6 +50,6 @@ async def spamProtection(message: discord.Message, spamWarnMsg: str, spamValue: 
             break
     try:
         if (a >= spamValue and message.created_at - last10messages[message.channel][-2]["time"] < datetime.timedelta(seconds = 60)) or last10messages[message.channel][-2]["content"] == message.content:
-            await message.channel.send(f"{message.author.mention} nespamuj!")
+            await message.channel.send(spamWarnMsg)
     except:
         pass

@@ -5,14 +5,14 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="bdbf", # Replace with your own username
-    version="0.0.3",
+    version="0.1.0",
     author="Bertik23",
     author_email="bertikxxiii@gmail.com",
     description="My discord bot framework",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/bertik23/bdbf",
-    packages=setuptools.find_packages(),
+    packages=["bdbf"],#setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
