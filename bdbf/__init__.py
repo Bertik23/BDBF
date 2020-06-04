@@ -1,5 +1,6 @@
 import discord
 import datetime
+import re
 
 commandPrefix : str = None
 embedFooter: dict = {}
@@ -19,6 +20,15 @@ def RgbToInt(rgb: (int,int,int)) -> int:
     print red, green, blue
     RGBint = (red<<16) + (green<<8) + blue
     return RGBint
+
+def hasLink(text: str) -> bool:
+        regex = re.compile(
+            "(([\w]+:)?//)?(([\d\w]|%[a-fA-f\d]{2,2})+(:([\d\w]|%[a-fA-f\d]{2,2})+)?@)?([\d\w][-\d\w]{0,253}[\d\w]\.)+[\w]{2,63}(:[\d]+)?(/([-+_~.\d\w]|%[a-fA-f\d]{2,2})*)*(\?(&?([-+_~.\d\w]|%[a-fA-f\d]{2,2})=?)*)?(#([-+_~.\d\w]|%[a-fA-f\d]{2,2})*)?"
+        )
+        if regex.match(text):
+            return True
+        else:
+            return False
 
 def embed(title, url = None, description = None, fields = None, image = None, thumbnail = None, author =  None) -> discord.Embed:
     e = discord.Embed.from_dict({
