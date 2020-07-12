@@ -6,6 +6,7 @@ commandPrefix : str = None
 embedFooter: dict = {}
 last10messages: dict = {}
 embedColor: (int,int,int) = ()
+botName : str = None
 
 def IntToRgb(RGBint: int) -> (int,int,int):
     blue =  RGBint & 255
@@ -17,7 +18,6 @@ def RgbToInt(rgb: (int,int,int)) -> int:
     red = rgb[0]
     green = rgb[1]
     blue = rgb[2]
-    print red, green, blue
     RGBint = (red<<16) + (green<<8) + blue
     return RGBint
 
@@ -46,6 +46,7 @@ def embed(title, url = None, description = None, fields = None, image = None, th
     return e
 
 def command(message) -> (str, str):
+    print("WARNING! This method of using commands is deprecated and will be removed in future versions!")
     if len(message) != 0:
         if message[0] == commandPrefix:
             if len(message[1:].split(" ", 1)) == 1:
@@ -57,7 +58,7 @@ def command(message) -> (str, str):
     else:
         return None, None
 
-async def spamProtection(message: discord.Message, spamWarnMsg: str = None, spamValue: int, spamDelWarnMsg: str = None, spamDelValue: int = -1):
+async def spamProtection(message: discord.Message, spamValue: int, spamWarnMsg: str = None, spamDelWarnMsg: str = None, spamDelValue: int = -1):
     if message.channel not in last10messages:
         last10messages[message.channel] = []
     if not message.author.bot and message.content[0] != commandPrefix:
@@ -67,8 +68,6 @@ async def spamProtection(message: discord.Message, spamWarnMsg: str = None, spam
     a = 0
     #print(len(last10messages[message.channel]), last10messages)
     for msg in last10messages[message.channel]:
-        for i in msg:
-            #print(msg[i])
         if msg["author"] == message.author:
             a += 1
         else:
