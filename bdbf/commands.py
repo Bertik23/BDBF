@@ -1,9 +1,10 @@
-import __init__
-from __init__ import embed
+import bdbf.main
+from bdbf.main import embed
+from bdbf.exceptions import  *
 import discord
 
-cmds = []
-__init__.commandPrefix = "~"
+cmds = {"all": []}
+commandPrefix : str = None
 
 class Command:
 	def __init__(self, description:str= None, usage: str= None):
@@ -16,41 +17,66 @@ class Command:
 	def command(self,args):
 		pass
 	def __str__(self):
-		return f"{type(self)}".split("'")[1].split(".")[1]
+		return f"{type(self)}".split("'")[1].split(".")[-1]
+	def __repr__(self):
+		return self.__str__()
 
 class help(Command):
 	def command(self,args):
 		fields = []
-		for cmd in cmds:
-			fields.append({"name": f"{__init__.commandPrefix}{cmd}", "value": f"{cmd.usage if cmd.usage else ''}"+('\n' if cmd.usage else '')+f"{cmd.description}"})
-		print(fields)
-		return fields
-		return embed(f"Help for {__init__.botName}",fields=fields)
+		for cmd in cmds["all"]:
+			fields.append({"name": f"{commandPrefix}{cmd}", "value": f"{cmd.usage.replace('%commandPrefix%',commandPrefix) if cmd.usage else ''}"+('\n' if cmd.usage else '')+f"{cmd.description}"})
+		try:
+			for cmd in cmds[args]:
+				fields.append({"name": f"{commandPrefix}{cmd}", "value": f"{cmd.usage.replace('%commandPrefix%',commandPrefix) if cmd.usage else ''}"+('\n' if cmd.usage else '')+f"{cmd.description}"})
+		except KeyError:
+			pass
+		return "",embed(f"Help for {bdbf.botName}",fields=fields)
 
-def checkForCommands(msg: discord.Message ,commandsList:list):
+async def checkForCommands(msg: discord.Message):
 	message = msg.content
-	if len(message) != 0:
-		if message[0] == __init__.commandPrefix:
-			if len(message[1:].split(" ", 1)) == 1:
-				cmd, args = message[1:], None
+	commandOut = None
+	try:
+		if len(message) != 0:
+			if message[:len(commandPrefix)] == commandPrefix:
+				if len(message[len(commandPrefix):].split(" ", 1)) == 1:
+					cmd, args = message[len(commandPrefix):], None
+				else:
+					cmd, args = message[len(commandPrefix):].split(" ", 1)[0], message[1:].split(" ",1)[1]
 			else:
-				cmd, args = message[1:].split(" ", 1)[0], message[1:].split(" ",1)[1]
+				cmd, args = None, None
 		else:
 			cmd, args = None, None
-	else:
-		cmd, args = None, None
-	for command in commandsList:
-		if cmd == str(command):
-			command.command(args)
+		for command in cmds["all"]:
+			if cmd == str(command):
+				if cmd == "help":
+					args = msg.channel.guild.id
+				commandOut = command.command(args)
+
+		try:
+			for command in cmds[msg.channel.guild.id]:
+				if cmd == str(command):
+					commandOut = command.command(args)
+		except KeyError:
+			pass
+
+		if commandOut != None:
+			await msg.channel.send(commandOut[0], embed=commandOut[1])
+
+	except TypeError:
+		if commandPrefix == None:
+			raise NoCommandPrefix("You haven't set a command prefix")
+		else:
+			raise NoCommandPrefix(f"Your commandPrefix is {type(commandPrefix)}, but it must be a string")
 
 
-c = Command()
-h = help("Returns this",f"{__init__.commandPrefix}help")
-print(c.description)
+
+h = help("Returns this","%commandPrefix%help")
+
+cmds["all"].append(h)
+
+"""print(c.description)
 print(h.description)
-
-
-cmds = [h]
 
 class TestMSG:
 	def __init__(self):
@@ -59,4 +85,4 @@ tstMsg = TestMSG()
 
 #print(h.command(None))
 
-checkForCommands(tstMsg, cmds)
+checkForCommands(tstMsg, cmds)"""

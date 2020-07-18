@@ -1,0 +1,2 @@
+class NoCommandPrefix(Exception):
+	pass
