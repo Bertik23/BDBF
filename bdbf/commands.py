@@ -14,7 +14,7 @@ class Command:
 			self.description = f"{self} description"
 		self.usage = usage
 
-	def command(self,args):
+	async def command(self,args):
 		pass
 	def __str__(self):
 		return f"{type(self)}".split("'")[1].split(".")[-1]
@@ -22,7 +22,7 @@ class Command:
 		return self.__str__()
 
 class help(Command):
-	def command(self,args):
+	async def command(self,args):
 		fields = []
 		for cmd in cmds["all"]:
 			fields.append({"name": f"{commandPrefix}{cmd}", "value": f"{cmd.usage.replace('%commandPrefix%',commandPrefix) if cmd.usage else ''}"+('\n' if cmd.usage else '')+f"{cmd.description}"})
@@ -56,7 +56,7 @@ async def checkForCommands(msg: discord.Message):
 		try:
 			for command in cmds[msg.channel.guild.id]:
 				if cmd == str(command):
-					commandOut = command.command(args)
+					commandOut = await command.command(args)
 		except KeyError:
 			pass
 
