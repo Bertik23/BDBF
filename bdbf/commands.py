@@ -51,7 +51,7 @@ async def checkForCommands(msg: discord.Message):
 			if cmd == str(command):
 				if cmd == "help":
 					args = msg.channel.guild.id
-				commandOut = command.command(args)
+				commandOut = await command.command(args)
 
 		try:
 			for command in cmds[msg.channel.guild.id]:
