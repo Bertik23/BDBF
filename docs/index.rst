@@ -10,9 +10,16 @@ This is the documentation for BDBF.
 
 .. toctree::
    :maxdepth: 2
+   :caption: Content
 
    basic
    commands
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Tutorials
+
+   tutorials/quickStart.rst
 
 
 
