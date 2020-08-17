@@ -5,11 +5,6 @@ Quick Start
 
 This Quick Start assumes you have some knowledge of making a discord bot in python.
 
-Instalation
-^^^^^^^^^^^
-1. Install the latest version of **bdbf** using ``pip install --upgrade bdbf``
-2. Import **bdbf** using ``import bdbf``
-
 Usage
 ^^^^^
 1. Import bdbf and discord
@@ -23,12 +18,12 @@ Usage
 
 3. Name your bot
 ::
-	bdbf.botName = "BDBF Bot"
+	bdbf.options.botName = "BDBF Bot"
 
 4. Setup your embed color and footer
 ::
-	bdbf.embedColor = (0,255,0)
-   	bdbf.embedFooter = {
+	bdbf.optinons.embedColor = (0,255,0)
+   	bdbf.options.embedFooter = {
    		"icon_url": "example.com/image.png",
    		"text": "Made using BDBF"
    	}
@@ -44,7 +39,7 @@ Usage
 6. To make a command maka a class that will be the name of the command, that inherits from the ``bdbf.commands.Command`` class, than define the command function for the class
 ::
    	class info(bdbf.commands.Command):
-		async def command(self, arguments):
+		async def command(self, arguments, msg):
 			return "This is the info embed", embed(f"Information for {bdbf.botName}", description="This is the info command")
 
 Beware that ``command`` is an *async* function and *arguments* is a single argument.

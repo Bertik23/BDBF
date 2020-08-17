@@ -1,6 +1,7 @@
 import bdbf.main
 from bdbf.main import embed
 from bdbf.exceptions import  *
+import bdbf.options
 import discord
 
 cmds = {"all": []}
@@ -14,7 +15,7 @@ class Command:
 			self.description = f"{self} description"
 		self.usage = usage
 
-	async def command(self,args):
+	async def command(self,args,message):
 		pass
 	def __str__(self):
 		return f"{type(self)}".split("'")[1].split(".")[-1]
@@ -31,7 +32,7 @@ class help(Command):
 				fields.append({"name": f"{commandPrefix}{cmd}", "value": f"{cmd.usage.replace('%commandPrefix%',commandPrefix) if cmd.usage else ''}"+('\n' if cmd.usage else '')+f"{cmd.description}"})
 		except KeyError:
 			pass
-		return "",embed(f"Help for {bdbf.botName}",fields=fields)
+		return "",embed(f"Help for {bdbf.options.botName}",fields=fields)
 
 async def checkForCommands(msg: discord.Message):
 	message = msg.content
@@ -51,23 +52,32 @@ async def checkForCommands(msg: discord.Message):
 			if cmd == str(command):
 				if cmd == "help":
 					args = msg.channel.guild.id
-				commandOut = await command.command(args)
+				try:
+					commandOut = await command.command(args, msg)
+				except TypeError as e:
+					commandOut = command.command(args, msg)
 
 		try:
 			for command in cmds[msg.channel.guild.id]:
 				if cmd == str(command):
-					commandOut = await command.command(args)
+					commandOut = await command.command(args, msg)
 		except KeyError:
 			pass
 
 		if commandOut != None:
-			await msg.channel.send(commandOut[0], embed=commandOut[1])
+			if type(commandOut) == tuple:
+				await msg.channel.send(commandOut[0], embed=commandOut[1])
+			else:
+				async for i in commandOut:
+					await msg.channel.send(i[0], embed=i[1])
 
-	except TypeError:
+	except TypeError as e:
 		if commandPrefix == None:
 			raise NoCommandPrefix("You haven't set a command prefix")
-		else:
+		elif type(commandPrefix) != str:
 			raise NoCommandPrefix(f"Your commandPrefix is {type(commandPrefix)}, but it must be a string")
+		else:
+			raise e
 
 
 

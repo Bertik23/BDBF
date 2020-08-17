@@ -13,6 +13,7 @@ This is the documentation for BDBF.
    :caption: Content
 
    basic
+   options
    commands
 
 .. toctree::

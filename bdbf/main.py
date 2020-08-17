@@ -1,11 +1,9 @@
 import discord
 import datetime
 import re
+import bdbf.options
 
-embedFooter: dict = {}
 last10messages: dict = {}
-embedColor: (int,int,int) = (0,0,0)
-botName : str = None
 
 def IntToRgb(RGBint: int) -> (int,int,int):
     blue =  RGBint & 255
@@ -32,30 +30,17 @@ def hasLink(text: str) -> bool:
 def embed(title, url = None, description = None, fields = None, image = None, thumbnail = None, author =  None) -> discord.Embed:
     e = discord.Embed.from_dict({
             "title": title,
-            "color": RgbToInt(embedColor),
+            "color": RgbToInt(bdbf.options.embedColor),
             "description": description,
             "image": image,
             "thumbnail": thumbnail,
             "author": author,
             "fields": fields,
             "url": url,
-            "footer": embedFooter
+            "footer": bdbf.options.embedFooter
             }
         )
     return e
-
-def command(message) -> (str, str):
-    print("WARNING! This method of using commands is deprecated and will be removed in future versions!")
-    if len(message) != 0:
-        if message[0] == commandPrefix:
-            if len(message[1:].split(" ", 1)) == 1:
-                return message[1:], None
-            else:
-                return message[1:].split(" ", 1)[0], message[1:].split(" ",1)[1]
-        else:
-            return None, None
-    else:
-        return None, None
 
 async def spamProtection(message: discord.Message, spamValue: int, spamWarnMsg: str = None, spamDelWarnMsg: str = None, spamDelValue: int = -1):
     if message.channel not in last10messages:

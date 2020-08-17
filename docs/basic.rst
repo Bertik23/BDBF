@@ -52,32 +52,3 @@ If the provided text has links in it.
 | *spamWarnMsg*: str - the message you want to send as a warning not to spam
 | *spamDelWarnMsg*: str - the message you want to send as a warning that all other messages will be deleted
 | *spamDelValue*: int - the number of the last message, that will not be deleted, to not delete any use ``-1``, which is the default
-
-Variables
-^^^^^^^^^
-
-``embedFooter``
-"""""""""""""""
-The footer of every embed created by the ``embed`` function
-
-| dict
-| {
-| 	"icon_url": str, - the url of the icon in the footer
-|	"text": str - the text of the footer
-| }
-
-``embedColor``
-""""""""""""""
-The color of all embeds created by the ``embed`` function in RGB
-
-| (
-|	int, - red
-|	int, - green
-|	int  - blue
-| )
-
-``botName``
-"""""""""""
-The name of the bot
-
-str
