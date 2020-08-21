@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="bdbf", # Replace with your own username
-    version="0.2.2",
+    version="0.2.2.1",
     author="Bertik23",
     author_email="bertikxxiii@gmail.com",
     description="Bertik23's discord bot framework",
@@ -19,4 +19,6 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.6',
+    install_requires=["discord.py>=1.4.1"],
+    keywords="discord, bot, framework"
 )

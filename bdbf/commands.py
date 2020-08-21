@@ -23,7 +23,7 @@ class Command:
 		return self.__str__()
 
 class help(Command):
-	async def command(self,args):
+	async def command(self,args, msg):
 		fields = []
 		for cmd in cmds["all"]:
 			fields.append({"name": f"{commandPrefix}{cmd}", "value": f"{cmd.usage.replace('%commandPrefix%',commandPrefix) if cmd.usage else ''}"+('\n' if cmd.usage else '')+f"{cmd.description}"})

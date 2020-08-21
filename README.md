@@ -1,5 +1,11 @@
 # BDBF
 Bertik23's DiscordBot framework
 
-# Roadmap
-On [this](https://trello.com/b/JBxKvJ5G) trell board you can see the roadmap for this project.
+# Instalation
+Use `pip install --upgade bdbf` to get the newest version of bdbf installed.
+
+# Documentation
+Head to [ReadTheDocs](bdbf.readthedocs.io/en/stable) to see the documentation.
+
+# Contributing
+Head to [my discord server](https://discord.gg/QGW3SMb) and ask there.
