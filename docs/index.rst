@@ -10,11 +10,11 @@ This is the documentation for BDBF.
 
 .. toctree::
    :maxdepth: 2
-   :caption: Content
+   :caption: Docstring
 
-   basic
-   options
-   commands
+   functions
+   main
+
 
 .. toctree::
    :maxdepth: 2

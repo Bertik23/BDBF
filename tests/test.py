@@ -1,31 +1,22 @@
-import sys
-
-sys.path.append("/home/bertik23/Programming/BDBF")
-#print(sys.path)
-
 import bdbf
 
-import discord
+client = bdbf.Client(commandPrefix="%")
 
-print(discord.version_info)
+@client.command("test")
+async def test(msg):
+    """Test"""
+    print("ahoj")
 
-bdbf.commands.commandPrefix = "%"
+@client.command("test2")
+async def test(msg):
+    """Test 2"""
+    print("ahoj2")
 
-class ahoj(bdbf.commands.Command):
-	async def command(self, args, message):
-		return f"Ahoj {message.author.mention}", None
-
-class zdar(bdbf.commands.Command):
-	async def command(self, args, message):
-		for i in range(int(args)):
-			yield f"Zdravím {i}", None
-
-bdbf.commands.cmds["all"].extend([ahoj(),zdar()])
-
-client = discord.Client()
 
 @client.event
-async def on_message(message):
-	await bdbf.commands.checkForCommands(message)
+async def on_message(msg):
+    print(msg.content)
 
-client.run("token")
+client.embed("Ahoj",fields=[("ahoj","nice"),("nice","ahoj",True)])
+
+client.run("NzMzOTg1MTk4NzgxNDk3NDA0.XxLG_A.ZRH2bEW0MgdqOJOB6UyxzQSfEz8")
