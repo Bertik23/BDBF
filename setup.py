@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="bdbf", # Replace with your own username
-    version="1.0.0dev0",
+    version="1.0.0",
     author="Bertik23",
     author_email="bertikxxiii@gmail.com",
     description="Bertik23's discord bot framework",

@@ -7,56 +7,39 @@ This Quick Start assumes you have some knowledge of making a discord bot in pyth
 
 Usage
 ^^^^^
-1. Import bdbf and discord
+1. Import bdbf
 ::
-	import bdbf
-   	import discord
+    import bdbf
 
 2. Setup your client
 ::
-   client = discord.Client()
+   client = bdbf.Client(
+                botName="BDBF Bot",
+                commandPrefix="%",
+                embedFooter={
+                        "icon_url": "example.com/image.png",
+                        "text": "Made using BDBF"
+                    },
+                embedColor=(123,123,123))
 
-3. Name your bot
-::
-	bdbf.options.botName = "BDBF Bot"
-
-4. Setup your embed color and footer
-::
-	bdbf.optinons.embedColor = (0,255,0)
-   	bdbf.options.embedFooter = {
-   		"icon_url": "example.com/image.png",
-   		"text": "Made using BDBF"
-   	}
-
-5. Setup the rest like normal
+3. Setup the rest like normal
 ::
    @client.event
    async def on_message(message):
-       #come code
+       #some code
 
    client.run("token")
 
-6. To make a command maka a class that will be the name of the command, that inherits from the ``bdbf.commands.Command`` class, than define the command function for the class
+4. To make a command use the wrapper ``client.command`` 
 ::
-   	class info(bdbf.commands.Command):
-		async def command(self, arguments, msg):
-			return "This is the info embed", embed(f"Information for {bdbf.botName}", description="This is the info command")
+    @client.command("hi")
+    async def hi(message):
+        await message.channel.send(f"Hello {msg.author.mention}")
 
-Beware that ``command`` is an *async* function and *arguments* is a single argument.
-Also the ``command`` function has to return ``str, discord.Embed`` in that order (or None if you don't want that)
+    @client.command("sayHelloTo")
+    async def sayHelloTo(message, *args):
+        await message.channel.send(f"Hello {args[0]}")
 
-7. To be able to use the command you made, add it to the ``bdbf.commands.cmds`` dictionary. Use key "all" to use it in all guilds or the guild id to use it just there.
-::
-	bdbf.commands.cmds["all"].append(info(description="This is the info command",usage="%commandPrefix%info"))
+Beware that the command function has to be a coroutine and that args is a tuple with 0 or 1 items
 
-8. Set a command prefix for your bot.
-::
-	bdbf.commands.commandPrefix = "&"
-
-9. To be able to use the command, await the ``bdbf.commands.checkForCommands()`` function in ``on_message()``
-::
-	@client.event
-	async def on_message(message):
-		await bdbf.commands.checkForCommands(message)
-
-And that's it you should now have a working bot.
+And that's it, you should now have a working bot.

@@ -1,5 +1,5 @@
 Main
 ====
 
-.. autoclass:: Client
+.. automodule:: main
    :members:
