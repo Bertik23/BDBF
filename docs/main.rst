@@ -2,4 +2,4 @@ Main
 ====
 
 .. automodule:: main
-   :members: Client
+   :members:
