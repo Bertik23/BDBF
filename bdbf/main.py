@@ -1,7 +1,6 @@
 import discord
 from bdbf.exceptions import *
 from bdbf.functions import *
-import typing
 import asyncio
 import logging
 

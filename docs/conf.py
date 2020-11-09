@@ -25,6 +25,8 @@ author = 'Bertik23'
 # The full version, including alpha/beta/rc tags
 release = '0.2.1.1'
 
+from mock import Mock
+sys.modules['discord'] = Mock()
 
 # -- General configuration ---------------------------------------------------
 
