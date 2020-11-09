@@ -1,7 +1,5 @@
-.. currentmodule:: bdbf
-
 Main
 ====
 
-.. automodule:: main
+.. autoclass:: Client
    :members:
