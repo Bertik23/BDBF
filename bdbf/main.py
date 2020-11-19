@@ -3,6 +3,7 @@ from bdbf.exceptions import *
 from bdbf.functions import *
 import asyncio
 import logging
+import traceback
 
 log = logging.getLogger(__name__)
 
@@ -25,9 +26,23 @@ class Client(discord.Client):
 
     :param useDefaultHelp: Optional[:class:`bool`]
         Whether to use the default help.
+        Default: True
 
     :param isHelpInline: Optional[:class:`bool`]
         If using the default help. Wheter it is inline or not.
+        Default: True
+
+    :param logging: Optional[:class`bool`]
+        If message logging is enabled.
+        Default: False
+
+    :param caseSensitiveCommands: Optional[:class`bool`]
+        If commands are case sensitive.
+        Default: True
+
+    :param sendExceptions: Optional[:class`bool`]
+        If sending exceptions to discord is enabled.
+        Default: True
     """
     def __init__(self, *, loop=None, **options):
         super().__init__(loop=loop, **options)
@@ -38,14 +53,16 @@ class Client(discord.Client):
         self.commandPrefix = options.pop("commandPrefix", None)
         self.logging = options.pop("logging", False)
         self.loggingFunction = None
+        self.caseSensitiveCommands = options.pop("caseSensitiveCommands", True)
+        self.sendExceptions = options.pop("sendExceptions", True)
 
         self.roleToReaction = {}
 
         if options.pop("useDefaultHelp", True):
             @self.command("help")
-            async def help(msg):
+            async def help(msg, *args):
                 """Help"""
-                fields = [(command, self.commands[command].__doc__, options.pop("isHelpInline", True)) for command in self.commands.keys()]
+                fields = [(command, self.commands[command].__doc__ if self.commands[command].__doc__ != None else f"{command} help", options.pop("isHelpInline", True)) for command in self.commands.keys()]
                 e = self.embed(f"Help for {self.botName}", fields=fields)
                 await msg.channel.send(embed=e)
 
@@ -57,7 +74,7 @@ class Client(discord.Client):
         async def on_raw_reaction_remove(payload):
             pass
     
-    def command(self, name, **options):
+    def command(self, commandName, **options):
         r"""Wrapper fuction for making commands.
         Like ::
 
@@ -65,6 +82,10 @@ class Client(discord.Client):
             def command(message):
                 print(message.content)"""
         def register(function):
+            if not self.caseSensitiveCommands:
+                name = commandName.lower()
+            else:
+                name = commandName
             if name in self.commands.keys():
                 raise CommandNameAlreadyRegistered(f"The command name {name} is already registered and can't be used again.")
             self.commands[name] = function
@@ -73,16 +94,12 @@ class Client(discord.Client):
         return register
 
     async def tryCommand(self, msg, command, *options):
+        print(command)
         try:
-            if None not in options:
-                try:
-                    await self.commands[command](msg, *options)
-                except:
-                    await self.commands[command](msg)
-            else:
-                await self.commands[command](msg)
-        except KeyError:
-            pass
+            if command in self.commands.keys():
+                await self.commands[command](msg, *options)
+        except Exception:
+            await msg.channel.send(traceback.format_exc())
 
     async def useCommand(self, msg):
         message = msg.content
@@ -96,6 +113,9 @@ class Client(discord.Client):
                 cmd, args = None, None
         else:
             cmd, args = None, None
+
+        if not self.caseSensitiveCommands and cmd != None:
+            cmd = cmd.lower()
 
         await self.tryCommand(msg, cmd, args)
 
