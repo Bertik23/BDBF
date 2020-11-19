@@ -32,15 +32,15 @@ class Client(discord.Client):
         If using the default help. Wheter it is inline or not.
         Default: True
 
-    :param logging: Optional[:class`bool`]
+    :param logging: Optional[:class:`bool`]
         If message logging is enabled.
         Default: False
 
-    :param caseSensitiveCommands: Optional[:class`bool`]
+    :param caseSensitiveCommands: Optional[:class:`bool`]
         If commands are case sensitive.
         Default: True
 
-    :param sendExceptions: Optional[:class`bool`]
+    :param sendExceptions: Optional[:class:`bool`]
         If sending exceptions to discord is enabled.
         Default: True
     """
@@ -76,12 +76,28 @@ class Client(discord.Client):
     
     def command(self, commandName, **options):
         r"""Wrapper fuction for making commands.
-        Like ::
+
+        :param worksOnlyInGuilds: Optional[:class:`List[int]`]
+            List of guild where the command will work. List of guild where the command will work.
+
+        :param worksOnlyInChannels: Optional[:class:`List[int]`]
+            List of channels where the command will work. If not provided will for in all.
+
+        :param doesntWorkInGuilds: Optional[:class:`List[int]`]
+            List of guilds where the command wont work. List of guild where the command will work.
+
+        :param doesntWorkInChannels: Optional[:class:`List[int]`]
+            List of guilds where the command wont work. List of guild where the command will work.
+
+        Example
+        -------
 
             @client.command("command")
             def command(message):
                 print(message.content)"""
         def register(function):
+            for option in options:
+                setattr(function, option, options[option])
             if not self.caseSensitiveCommands:
                 name = commandName.lower()
             else:
@@ -97,7 +113,20 @@ class Client(discord.Client):
         print(command)
         try:
             if command in self.commands.keys():
-                await self.commands[command](msg, *options)
+                if hasattr(self.commands[command],"worksOnlyInGuilds"):
+                    if msg.channel.guild.id in self.commands[command].worksOnlyInGuilds:
+                        await self.commands[command](msg, *options)
+                elif hasattr(self.commands[command],"worksOnlyInChannels"):
+                    if msg.channel.id in self.commands[command].worksOnlyInChannels:
+                        await self.commands[command](msg, *options)
+                elif hasattr(self.commands[command], "doesntWorkInGuilds"):
+                    if msg.channel.guild.id not in self.commands[command].doesntWorkInGuilds:
+                        await self.commands[command](msg, *options)
+                elif hasattr(self.commands[command], "doesntWorkInChannels"):
+                    if msg.channel.id not in self.commands[command].doesntWorkInChannels:
+                        await self.commands[command](msg, *options)
+                else:
+                    await self.commands[command](msg, *options)
         except Exception:
             await msg.channel.send(traceback.format_exc())
 

@@ -8,7 +8,7 @@ client = bdbf.Client(commandPrefix="%", logging=True, caseSensitiveCommands=Fals
 
 print(bdbf.__version__)
 
-@client.command("test")
+@client.command("test", doesntWorkInChannels=[727212369117446252])
 async def test(msg, *args):
     """Test"""
     print("ahoj", args)

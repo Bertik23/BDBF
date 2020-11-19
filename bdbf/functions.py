@@ -82,6 +82,9 @@ def embed(title, url = None, description = None, fields = None, image = None, th
     if type(color) == tuple:
         color = RgbToInt(color)
 
+    if fields == None:
+        fields = []
+
     fieldKeys = []
     for i,f in enumerate(fields):
         if len(f) == 2:
