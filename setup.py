@@ -1,11 +1,17 @@
 import setuptools
 
+import os
+import sys
+sys.path.insert(0, os.path.abspath('../bdbf'))
+
+from bdbf import __version__
+
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
     name="bdbf", # Replace with your own username
-    version="1.0.0",
+    version=__version__,
     author="Bertik23",
     author_email="bertikxxiii@gmail.com",
     description="Bertik23's discord bot framework",

@@ -23,7 +23,8 @@ copyright = '2020, Bertik23'
 author = 'Bertik23'
 
 # The full version, including alpha/beta/rc tags
-release = '0.2.1.1'
+from bdbf import __version__
+release = __version__
 
 from mock import Mock
 sys.modules['discord'] = Mock()
