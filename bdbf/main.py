@@ -4,6 +4,7 @@ from bdbf.functions import *
 import asyncio
 import logging
 import traceback
+import time
 
 log = logging.getLogger(__name__)
 
@@ -53,8 +54,10 @@ class Client(discord.Client):
         self.commandPrefix = options.pop("commandPrefix", None)
         self.logging = options.pop("logging", False)
         self.loggingFunction = None
+        self.commandLoggingFunction = None
         self.caseSensitiveCommands = options.pop("caseSensitiveCommands", True)
         self.sendExceptions = options.pop("sendExceptions", True)
+        self.createTaskCommands = options.pop("createTaskCommands", False)
 
         self.roleToReaction = {}
 
@@ -96,6 +99,8 @@ class Client(discord.Client):
             def command(message):
                 print(message.content)"""
         def register(function):
+            if function.__doc__ != None:
+                function.__doc__ = function.__doc__.replace("%commandPrefix%", self.commandPrefix)
             for option in options:
                 setattr(function, option, options[option])
             if not self.caseSensitiveCommands:
@@ -110,7 +115,9 @@ class Client(discord.Client):
         return register
 
     async def tryCommand(self, msg, command, *options):
-        print(command)
+        startTime = time.time()
+        state = "Succeded"
+        e = ""
         try:
             if command in self.commands.keys():
                 if hasattr(self.commands[command],"worksOnlyInGuilds"):
@@ -128,7 +135,16 @@ class Client(discord.Client):
                 else:
                     await self.commands[command](msg, *options)
         except Exception:
-            await msg.channel.send(traceback.format_exc())
+            state = "Failed"
+            e = traceback.format_exc()
+            if self.sendExceptions:
+                await msg.channel.send(f"```{e}```"[:2000])
+        if self.logging:
+            if self.commandLoggingFunction != None:
+                if asyncio.iscoroutinefunction(self.commandLoggingFunction):
+                    await self.commandLoggingFunction(msg)
+                else:
+                    self.commandLoggingFunction(command, msg, time.time()-startTime, e)
 
     async def useCommand(self, msg):
         message = msg.content
@@ -145,8 +161,11 @@ class Client(discord.Client):
 
         if not self.caseSensitiveCommands and cmd != None:
             cmd = cmd.lower()
-
-        await self.tryCommand(msg, cmd, args)
+        
+        if not self.createTaskCommands:
+            await self.tryCommand(msg, cmd, args)
+        else:
+            await self.loop.create_task(self.tryCommand(msg, cmd, args))
 
     def event(self, coro):
         r"""A decorator that registers an event to listen to.
@@ -223,10 +242,21 @@ class Client(discord.Client):
             @client.logMessage
             def log(message):
                 print(message.content)"""
-        print("ahoj0")
+        
         self.loggingFunction = function
-        print("ahoj")
         log.debug(f"Function {function.__name__} has been registered as message logging function.")
+        return function
+
+    def logCommand(self, function):
+        r"""Wrapper fuction for making a logging function.
+        Like ::
+
+            @client.logCommand
+            def log(command, message, time, state, exception):
+                print(message.content)"""
+        
+        self.commandLoggingFunction = function
+        log.debug(f"Function {function.__name__} has been registered as command logging function.")
         return function
 
     def reactionRole(self, msg, emoji, role):

@@ -22,13 +22,17 @@ async def test1(msg, *args):
 def loging(msg):
     log.info(msg.content)
 
+@client.logCommand
+def loging(*args):
+    log.info(args)
+
 @client.event
 async def on_ready():
     print("Ready")
 
 @client.event
 async def on_message(msg):
-    print(msg.content)
+    #print(msg.content)
     if msg.content == "0":
         return {"log": False}
 
