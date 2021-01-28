@@ -134,12 +134,15 @@ class Client(discord.Client):
                         await self.commands[command](msg, *options)
                 else:
                     await self.commands[command](msg, *options)
+            else:
+                state = "Failed"
+                e = "Command not existent"
         except Exception:
             state = "Failed"
             e = traceback.format_exc()
             if self.sendExceptions:
                 await msg.channel.send(f"```{e}```"[:2000])
-        if self.logging:
+        if self.logging and command != None:
             if self.commandLoggingFunction != None:
                 if asyncio.iscoroutinefunction(self.commandLoggingFunction):
                     await self.commandLoggingFunction(msg)
