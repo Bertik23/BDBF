@@ -8,10 +8,12 @@ import time
 
 log = logging.getLogger(__name__)
 
+
 class Client(discord.Client):
     r"""Discord client class inherited from discord.Client.
     This documentation covers only the changes. For the inherited
-    functions please head to the `discord.py documentation <https://discordpy.readthedocs.io/en/latest/api.html#discord.Client>`_
+    functions please head to the `discord.py documentation
+    <https://discordpy.readthedocs.io/en/latest/api.html#discord.Client>`_
 
     :param embedFooter: Optional[:class:`dict`]
         The footer of embeds.
@@ -45,11 +47,12 @@ class Client(discord.Client):
         If sending exceptions to discord is enabled.
         Default: True
     """
+
     def __init__(self, *, loop=None, **options):
         super().__init__(loop=loop, **options)
         self.commands = {}
         self.embedFooter = options.pop("embedFooter", {})
-        self.embedColor = options.pop("embedColor", (0,0,0))
+        self.embedColor = options.pop("embedColor", (0, 0, 0))
         self.botName = options.pop("botName", None)
         self.commandPrefix = options.pop("commandPrefix", None)
         self.logging = options.pop("logging", False)
@@ -65,7 +68,15 @@ class Client(discord.Client):
             @self.command("help")
             async def help(msg, *args):
                 """Help"""
-                fields = [(command, self.commands[command].__doc__ if self.commands[command].__doc__ != None else f"{command} help", options.pop("isHelpInline", True)) for command in self.commands.keys()]
+                fields = [
+                    (
+                        command,
+                        self.commands[command].__doc__
+                        if self.commands[command].__doc__ is not None
+                        else f"{command} help",
+                        options.pop("isHelpInline", True)
+                    ) for command in self.commands.keys()
+                ]
                 e = self.embed(f"Help for {self.botName}", fields=fields)
                 await msg.channel.send(embed=e)
 
@@ -76,21 +87,25 @@ class Client(discord.Client):
         @self.event
         async def on_raw_reaction_remove(payload):
             pass
-    
+
     def command(self, commandName, **options):
         r"""Wrapper fuction for making commands.
 
         :param worksOnlyInGuilds: Optional[:class:`List[int]`]
-            List of guild where the command will work. List of guild where the command will work.
+            List of guild where the command will work. List of guild where the
+            command will work.
 
         :param worksOnlyInChannels: Optional[:class:`List[int]`]
-            List of channels where the command will work. If not provided will for in all.
+            List of channels where the command will work. If not provided will
+            for in all.
 
         :param doesntWorkInGuilds: Optional[:class:`List[int]`]
-            List of guilds where the command wont work. List of guild where the command will work.
+            List of guilds where the command wont work. List of guild where
+            the command will work.
 
         :param doesntWorkInChannels: Optional[:class:`List[int]`]
-            List of guilds where the command wont work. List of guild where the command will work.
+            List of guilds where the command wont work. List of guild where
+            the command will work.
 
         Example
         -------
@@ -99,8 +114,9 @@ class Client(discord.Client):
             def command(message):
                 print(message.content)"""
         def register(function):
-            if function.__doc__ != None:
-                function.__doc__ = function.__doc__.replace("%commandPrefix%", self.commandPrefix)
+            if function.__doc__ is not None:
+                function.__doc__ = function.__doc__.replace(
+                    "%commandPrefix%", self.commandPrefix)
             for option in options:
                 setattr(function, option, options[option])
             if not self.caseSensitiveCommands:
@@ -108,9 +124,15 @@ class Client(discord.Client):
             else:
                 name = commandName
             if name in self.commands.keys():
-                raise CommandNameAlreadyRegistered(f"The command name {name} is already registered and can't be used again.")
+                raise CommandNameAlreadyRegistered(
+                    f"The command name {name} is already"
+                    "registered and can't be used again."
+                )
             self.commands[name] = function
-            log.debug(f"Function {function.__name__} has been registered for command {name}")
+            log.debug(
+                f"Function {function.__name__}"
+                f"has been registered for command {name}"
+            )
             return function
         return register
 
@@ -120,17 +142,21 @@ class Client(discord.Client):
         e = ""
         try:
             if command in self.commands.keys():
-                if hasattr(self.commands[command],"worksOnlyInGuilds"):
-                    if msg.channel.guild.id in self.commands[command].worksOnlyInGuilds:
+                if hasattr(self.commands[command], "worksOnlyInGuilds"):
+                    if msg.channel.guild.id in self.commands[
+                            command].worksOnlyInGuilds:
                         await self.commands[command](msg, *options)
-                elif hasattr(self.commands[command],"worksOnlyInChannels"):
-                    if msg.channel.id in self.commands[command].worksOnlyInChannels:
+                elif hasattr(self.commands[command], "worksOnlyInChannels"):
+                    if msg.channel.id in self.commands[
+                            command].worksOnlyInChannels:
                         await self.commands[command](msg, *options)
                 elif hasattr(self.commands[command], "doesntWorkInGuilds"):
-                    if msg.channel.guild.id not in self.commands[command].doesntWorkInGuilds:
+                    if msg.channel.guild.id not in self.commands[
+                            command].doesntWorkInGuilds:
                         await self.commands[command](msg, *options)
                 elif hasattr(self.commands[command], "doesntWorkInChannels"):
-                    if msg.channel.id not in self.commands[command].doesntWorkInChannels:
+                    if msg.channel.id not in self.commands[
+                            command].doesntWorkInChannels:
                         await self.commands[command](msg, *options)
                 else:
                     await self.commands[command](msg, *options)
@@ -142,12 +168,13 @@ class Client(discord.Client):
             e = traceback.format_exc()
             if self.sendExceptions:
                 await msg.channel.send(f"```{e}```"[:2000])
-        if self.logging and command != None:
-            if self.commandLoggingFunction != None:
+        if self.logging and command is not None:
+            if self.commandLoggingFunction is not None:
                 if asyncio.iscoroutinefunction(self.commandLoggingFunction):
                     await self.commandLoggingFunction(msg)
                 else:
-                    self.commandLoggingFunction(command, msg, time.time()-startTime, e)
+                    self.commandLoggingFunction(
+                        command, msg, time.time()-startTime, e)
 
     async def useCommand(self, msg):
         message = msg.content
@@ -156,15 +183,19 @@ class Client(discord.Client):
                 if len(message[len(self.commandPrefix):].split(" ", 1)) == 1:
                     cmd, args = message[len(self.commandPrefix):], None
                 else:
-                    cmd, args = message[len(self.commandPrefix):].split(" ", 1)[0], message[1:].split(" ",1)[1]
+                    cmd, args = message[
+                        len(self.commandPrefix):
+                    ].split(" ", 1)[
+                        0
+                    ], message[1:].split(" ", 1)[1]
             else:
                 cmd, args = None, None
         else:
             cmd, args = None, None
 
-        if not self.caseSensitiveCommands and cmd != None:
+        if not self.caseSensitiveCommands and cmd is not None:
             cmd = cmd.lower()
-        
+
         if not self.createTaskCommands:
             await self.tryCommand(msg, cmd, args)
         else:
@@ -173,9 +204,11 @@ class Client(discord.Client):
     def event(self, coro):
         r"""A decorator that registers an event to listen to.
 
-        You can find more info about the events on the :ref:`documentation below <discord-api-events>`.
+        You can find more info about the events on the :ref:`documentation
+        below <discord-api-events>`.
 
-        The events must be a :ref:`coroutine <coroutine>`, if not, :exc:`TypeError` is raised.
+        The events must be a :ref:`coroutine <coroutine>`, if not,
+        :exc:`TypeError` is raised.
 
         Example
         ---------
@@ -194,12 +227,12 @@ class Client(discord.Client):
         if coro.__name__ == "on_message":
             async def on_message(msg, **options):
                 a = await coro(msg, **options)
-                if a == None:
+                if a is None:
                     a = {}
-                if a.pop("command",True):
+                if a.pop("command", True):
                     await self.useCommand(msg)
                 if a.pop("log", True) and self.logging:
-                    if self.loggingFunction != None:
+                    if self.loggingFunction is not None:
                         if asyncio.iscoroutinefunction(self.loggingFunction):
                             await self.loggingFunction(msg)
                         else:
@@ -221,22 +254,39 @@ class Client(discord.Client):
                 return a
             return super().event(on_raw_reaction_remove)
 
-
         return super().event(coro)
 
     async def tryReactionRole(self, a, payload):
         if a == "add":
             try:
-                await payload.member.add_roles(discord.Object(self.roleToReaction[payload.message_id][payload.emoji.name]))
+                await payload.member.add_roles(
+                    discord.Object(
+                        self.roleToReaction[
+                            payload.message_id
+                        ][
+                            payload.emoji.name
+                        ]
+                    )
+                )
             except KeyError:
                 pass
         elif a == "remove":
             try:
-                await self.get_guild(payload.guild_id).get_member(payload.user_id).remove_roles(discord.Object(self.roleToReaction[payload.message_id][payload.emoji.name]))
+                await self.get_guild(
+                    payload.guild_id
+                ).get_member(
+                    payload.user_id
+                ).remove_roles(
+                    discord.Object(
+                        self.roleToReaction[
+                            payload.message_id
+                        ][
+                            payload.emoji.name
+                        ]
+                    )
+                )
             except KeyError:
                 pass
-
-
 
     def logMessage(self, function):
         r"""Wrapper fuction for making a logging function.
@@ -245,9 +295,12 @@ class Client(discord.Client):
             @client.logMessage
             def log(message):
                 print(message.content)"""
-        
+
         self.loggingFunction = function
-        log.debug(f"Function {function.__name__} has been registered as message logging function.")
+        log.debug(
+            f"Function {function.__name__} has been "
+            "registered as message logging function."
+        )
         return function
 
     def logCommand(self, function):
@@ -257,16 +310,20 @@ class Client(discord.Client):
             @client.logCommand
             def log(command, message, time, state, exception):
                 print(message.content)"""
-        
+
         self.commandLoggingFunction = function
-        log.debug(f"Function {function.__name__} has been registered as command logging function.")
+        log.debug(
+            f"Function {function.__name__} has been "
+            "registered as command logging function."
+        )
         return function
 
     def reactionRole(self, msg, emoji, role):
         r"""Function to add reaction role functions to a message.
-        
+
         :param msg: :class:`Union[discord.Message,int]`
-            Message or message id of the message you want to add the reaction role functionality.
+            Message or message id of the message you want to add
+            the reaction role functionality.
         :param emoji: :class:`str`
             Emoji. If a unicode emoji use it, if a custom emoji use it's name.
         :param role: :class:`int`
@@ -274,12 +331,15 @@ class Client(discord.Client):
         if type(msg) == discord.Message:
             msg = msg.id
         elif type(msg) != int:
-            raise TypeError(f"Message has to be eighter int or discord.Message not {type(msg)}")
-        
+            raise TypeError(
+                f"Message has to be eighter "
+                f"int or discord.Message not {type(msg)}")
+
         self.roleToReaction[msg] = {emoji: role}
 
     def embed(self, title, **options):
-        """Returns discord embed from given parameters with automatic footer and color options.
+        """Returns discord embed from given parameters with automatic
+        footer and color options.
 
         :param title: :class:`str`
             Title of the embed
@@ -289,13 +349,19 @@ class Client(discord.Client):
             Description of the embed
         :param fields: :class:`Optional[List[Tuple[str,str,Optional[bool]]]]`
             Fields of the embed.
-            A tuple with item 1 being the name of the field, item 2 the value and item 3 weather is inline or not, item 3 is optional
+            A tuple with item 1 being the name of the field, item 2 the value
+            and item 3 weather is inline or not, item 3 is optional
         :param image: :class:`Optional[str]`
             Url of the embed image
         :param thumbnail: :class:`Optional[str]`
             Url of the thumbnail image
         :param author: :class:`Optional[Dict[str,str]]`
             Author of the embed
-            
+
         :returns: :class:`discord.Embed`"""
-        return embed(title,footer=self.embedFooter, color=self.embedColor, **options)
+        return embed(
+            title,
+            footer=self.embedFooter,
+            color=self.embedColor,
+            **options
+        )

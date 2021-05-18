@@ -5,7 +5,7 @@
 # BDBF/build/lib/bdbf/commands.py: 4
 # BDBF/build/lib/bdbf/main.py: 1
 # BDBF/tests/test.py: 8
-discord.py == 1.4.1
+discord.py == 1.7.2
 
 # BDBF/setup.py: 1
 setuptools == 49.2.0
