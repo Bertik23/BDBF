@@ -67,7 +67,11 @@ class Client(discord.Client):
         if options.get("useDefaultHelp", True):
             @self.command("help")
             async def help(msg, *args):
-                """Help"""
+                """Help
+                
+                **Usage:** `%commandPrefix%help [command]`
+                **Eg.** `%commandPrefix%help`, `%commandPrefix%help help
+                """
                 args = args[0]
                 if args is not None and args not in self.commands:
                     await msg.reply(f"Command {args} does not exist.")
