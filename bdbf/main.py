@@ -64,20 +64,47 @@ class Client(discord.Client):
 
         self.roleToReaction = {}
 
-        if options.pop("useDefaultHelp", True):
+        if options.get("useDefaultHelp", True):
             @self.command("help")
             async def help(msg, *args):
                 """Help"""
-                fields = [
-                    (
-                        command,
-                        self.commands[command].__doc__
-                        if self.commands[command].__doc__ is not None
-                        else f"{command} help",
-                        options.pop("isHelpInline", True)
-                    ) for command in self.commands.keys()
-                ]
-                e = self.embed(f"Help for {self.botName}", fields=fields)
+                args = args[0]
+                if args is not None and args not in self.commands:
+                    await msg.reply(f"Command {args} does not exist.")
+                    return
+                if args is None:
+                    description = None
+                    fields = [
+                        (
+                            command,
+                            self.commands[command].__doc__
+                            if self.commands[command].__doc__ is not None
+                            else f"{command} help",
+                            options.get("isHelpInline", True)
+                        ) for command in self.commands.keys()
+                    ]
+                elif args in self.commands:
+                    description = "\n".join(
+                        [
+                            f"Help for **{self.commandPrefix}{args}**\n",
+                            self.commands[args].__doc__
+                            if self.commands[args].__doc__ is not None
+                            else f"{args} help"
+                        ]
+                    )
+                    if hasattr(self.commands[args], "longHelp"):
+                        fields = [
+                            (title, text, options.get("isHelpInline", True))
+                            for title, text in self.commands[args].longHelp
+                        ]
+                    else:
+                        fields = None
+
+                e = self.embed(
+                    f"Help for {self.botName}",
+                    description=description,
+                    fields=fields
+                )
                 await msg.channel.send(embed=e)
 
         @self.event

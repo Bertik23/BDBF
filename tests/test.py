@@ -1,7 +1,7 @@
 import bdbf
 import logging
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.FATAL)
 log = logging.getLogger(__name__)
 
 client = bdbf.Client(
@@ -12,7 +12,7 @@ client = bdbf.Client(
 print(bdbf.__version__)
 
 
-@client.command("test", doesntWorkInChannels=[727212369117446252])
+@client.command("test")
 async def test(msg, *args):
     """Test"""
     print("ahoj", args)
@@ -66,5 +66,17 @@ async def test_command(msg, args):
             ]
         )
     )
+
+
+@client.command(
+    "longHelp",
+    longHelp=[
+        ("Title1", "This is a long help"),
+        ("Title2", "This is a second subhelp")
+    ]
+)
+async def longHelp_command(msg, *args):
+    await msg.reply("long help test")
+
 
 client.run("")
