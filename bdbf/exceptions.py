@@ -1,8 +1,10 @@
 class NoCommandPrefix(Exception):
-	pass
+    pass
+
 
 class CommandFunctionAlreadyRegistered(Exception):
-	pass
+    pass
+
 
 class CommandNameAlreadyRegistered(Exception):
-	pass
+    pass

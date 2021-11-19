@@ -5,6 +5,7 @@ import asyncio
 import logging
 import traceback
 import time
+from discord_slash import SlashCommand
 
 log = logging.getLogger(__name__)
 
@@ -61,6 +62,7 @@ class Client(discord.Client):
         self.caseSensitiveCommands = options.pop("caseSensitiveCommands", True)
         self.sendExceptions = options.pop("sendExceptions", True)
         self.createTaskCommands = options.pop("createTaskCommands", False)
+        self.slash = SlashCommand(self)
 
         self.roleToReaction = {}
 
@@ -114,6 +116,11 @@ class Client(discord.Client):
             def command(message):
                 print(message.content)"""
         def register(function):
+            try:
+                fName = function.__name__
+            except AttributeError:
+                fName = "No function name found"
+            # function = self.slash.slash(name=commandName)(function)
             if function.__doc__ is not None:
                 function.__doc__ = function.__doc__.replace(
                     "%commandPrefix%", self.commandPrefix)
@@ -130,7 +137,7 @@ class Client(discord.Client):
                 )
             self.commands[name] = function
             log.debug(
-                f"Function {function.__name__}"
+                f"Function {fName}"
                 f"has been registered for command {name}"
             )
             return function
@@ -168,13 +175,16 @@ class Client(discord.Client):
             e = traceback.format_exc()
             if self.sendExceptions:
                 await msg.channel.send(f"```{e}```"[:2000])
-        if self.logging and command is not None:
-            if self.commandLoggingFunction is not None:
-                if asyncio.iscoroutinefunction(self.commandLoggingFunction):
-                    await self.commandLoggingFunction(msg)
-                else:
-                    self.commandLoggingFunction(
-                        command, msg, time.time()-startTime, e)
+        if (
+            self.logging
+            and command is not None
+            and self.commandLoggingFunction is not None
+        ):
+            if asyncio.iscoroutinefunction(self.commandLoggingFunction):
+                await self.commandLoggingFunction(msg)
+            else:
+                self.commandLoggingFunction(
+                    command, msg, time.time()-startTime, e)
 
     async def useCommand(self, msg):
         message = msg.content

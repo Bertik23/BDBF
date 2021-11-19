@@ -35,8 +35,8 @@ sys.modules['discord'] = Mock()
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-"sphinx_rtd_theme",
-'sphinx.ext.autodoc'
+    "sphinx_rtd_theme",
+    'sphinx.ext.autodoc'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -62,7 +62,7 @@ html_static_path = ['_static']
 
 html_theme_options = {
     'canonical_url': '',
-    'analytics_id': 'UA-XXXXXXX-1',  #  Provided by Google in your dashboard
+    'analytics_id': 'UA-XXXXXXX-1',  # Provided by Google in your dashboard
     'logo_only': False,
     'display_version': True,
     'prev_next_buttons_location': 'bottom',

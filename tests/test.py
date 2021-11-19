@@ -1,7 +1,8 @@
 import bdbf
 import logging
+from discord_slash import SlashCommand
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger(__name__)
 
 client = bdbf.Client(
@@ -10,6 +11,10 @@ client = bdbf.Client(
     caseSensitiveCommands=False)
 
 print(bdbf.__version__)
+
+slash = SlashCommand(client)
+
+thebotas = 540563312857841714
 
 
 @client.command("test", doesntWorkInChannels=[727212369117446252])
@@ -66,5 +71,11 @@ async def test_command(msg, args):
             ]
         )
     )
+
+
+@client.command("slashTest2")
+@slash.slash(name="slashTest2", guild_ids=[thebotas])
+async def command_slashTest(*args):
+    print(args)
 
 client.run("")
